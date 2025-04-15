@@ -47,7 +47,7 @@ module Options
       true
     when "save"
       save
-      true
+      false
     when "load"
       new_load = load
       @board = new_load.board
