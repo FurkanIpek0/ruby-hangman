@@ -78,13 +78,14 @@ class Board
   end
 
   def self.create_open_treasure_word(treasure_word)
-    treasure_word.map do |letter|
+    word = treasure_word.map do |letter|
       if letter[1]
         letter[0]
       else
         "_"
       end
     end
+    word.join
   end
 
   def random_letter_index
@@ -98,6 +99,10 @@ class Board
   def open_treasure_word
     @treasure_word[random_letter_index][1] = true
     @opened_treasure_word = Board.create_open_treasure_word(@treasure_word)
+  end
+
+  def win_controller(answer)
+    @treasure_word.map { |letter| letter[0] }.join == answer
   end
 
   def bring_parts

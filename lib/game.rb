@@ -1,9 +1,13 @@
 require_relative "game/board"
 require_relative "game/question"
 require_relative "game/player"
+require_relative "game/options"
 
 # class holds game
 class Game
+  include Options
+  attr_reader :board, :player
+
   include Question
   def initialize
     @board = Game.create_board
@@ -14,43 +18,41 @@ class Game
     Question.question_input("Start game?", "yes", "ok")
     loop do
       game_options = options
-      puts "Score is #{player.name}: #{player.score}"
+      return if game_options == false
+
+      game_reset
+      puts "Score is #{@player.name}: #{@player.score}"
       loop do
-        puts @board.hangman
+        puts @board.bring_parts
         puts @board.opened_treasure_word
+        puts "Guess the word"
         answer = gets.chomp.downcase
-        game_status = answer == @board.treasure_word ? win : didnt_win
+        game_status = @board.win_controller(answer) ? win : didnt_win
         break if game_status == false
       end
     end
   end
 
-  def options
-    puts "exit/continue/save/load"
-    answer = gets.chomp.downcase
-    case answer
-    when "exit"
-      false
-    when "continue"
-      true
-    end
-  end
-
   def win
+    @board.open_treasure_word
     puts "#{@player.name} wins this round"
-    puts "Word is #{@board.treasure_word}"
+    puts "Word is #{@board.opened_treasure_word}"
     @player.score += 1
     false
   end
 
   def didnt_win
-    @board.opened_treasure_word = @board.give_letter
-    if @board.treasure_word == @board.opened_treasure_word
-      puts "All words opened you lost"
-      false
-    else
+    @board.open_treasure_word
+    if @board.opened_treasure_word.include?("_")
       true
+    else
+      puts "All words opened you lost word is #{@board.opened_treasure_word}"
+      false
     end
+  end
+
+  def game_reset
+    @board = Game.create_board
   end
 
   def self.create_player
@@ -59,6 +61,6 @@ class Game
   end
 
   def self.create_board
-    Board.create
+    Board.new
   end
 end

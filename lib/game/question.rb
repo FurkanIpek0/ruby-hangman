@@ -14,7 +14,7 @@ module Question
     loop do
       puts question
       answer = gets.chomp.downcase
-      answer if answers.include?(answer)
+      return answer if answers.include?(answer)
     end
   end
 end
